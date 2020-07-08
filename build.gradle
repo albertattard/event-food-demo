@@ -1,0 +1,68 @@
+plugins {
+  id 'java'
+
+  id 'org.springframework.boot' version '2.3.0.RELEASE'
+  id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+
+  id 'info.solidsoft.pitest' version '1.5.1'
+  id 'com.dorongold.task-tree' version '1.5'
+}
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_14
+  targetCompatibility = JavaVersion.VERSION_14
+}
+
+repositories {
+  mavenCentral()
+  jcenter()
+}
+
+dependencies {
+  /* Lombok */
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
+
+  /* Spring */
+  implementation 'org.springframework.boot:spring-boot-starter-amqp'
+  testImplementation('org.springframework.boot:spring-boot-starter-test') {
+    exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+  }
+
+  runtimeOnly 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
+
+  testImplementation 'org.springframework.amqp:spring-rabbit-test'
+}
+
+test {
+  useJUnitPlatform()
+  testLogging {
+    events = ['FAILED', 'PASSED', 'SKIPPED', 'STANDARD_OUT']
+  }
+
+  doFirst {
+    file("$rootDir/.env")
+      .readLines()
+      .findAll({ line -> !line.isBlank() && !line.startsWith("#") })
+      .each() {
+        def (key, value) = it.split('=', 2)
+        environment key, value
+      }
+  }
+}
+
+bootRun {
+  doFirst {
+    file("$rootDir/.env")
+      .readLines()
+      .findAll({ line -> !line.isBlank() && !line.startsWith("#") })
+      .each() {
+        def (key, value) = it.split('=', 2)
+        environment key, value
+      }
+  }
+}
+
+bootJar {
+  layered()
+}
