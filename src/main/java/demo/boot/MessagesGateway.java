@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 public class MessagesGateway {
 
   @RabbitListener( queues = "${app.queue.food}" )
-  public void handleFoodPreference( final FoodPreference preference ) {
+  public void handleFoodPreference( final AttendeeFoodPreference preference ) {
     System.out.printf( "Received food preference %s%n", preference );
   }
 
